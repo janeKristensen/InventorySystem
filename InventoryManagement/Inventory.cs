@@ -1,5 +1,7 @@
 ﻿using CsvHelper;
+using System.Drawing;
 using System.Globalization;
+using System.Xml.Linq;
 
 namespace InventoryManagement
 {
@@ -11,8 +13,8 @@ namespace InventoryManagement
 
     public sealed class Inventory : IListener
     {
-        // Dict of all substances that has been added to inventory
-        private Dictionary<string, Substance> _subDict = new Dictionary<string, Substance>();
+        // All substances that have been added to inventory
+        private Dictionary<string, Substance> _substanceDict = new();
 
         // Class is implemented as a singleton
         private static Inventory? _instance;
@@ -33,20 +35,32 @@ namespace InventoryManagement
             Console.WriteLine("\nOrder received in inventory!\n");
 
             // Locate substance in dictionary using key and subtract amount from stock
-            (string Name, string VialSize, int Amount)[] substanceOrder = order.SubstanceList;
-            foreach (var line in substanceOrder)
+            foreach (var line in order.SubstanceList)
             {
                 string key = (line.Name + line.VialSize);
+                Substance sub;
                 try
                 {
-                    var sub = _subDict[key];
-                    sub.subtractStock(line.Amount);
+                    sub = _substanceDict[key];
                 }
                 catch (KeyNotFoundException)
                 {
-                    Console.WriteLine($"Substance {line.Name}  {line.VialSize} was not found in inventory");
+                    Console.WriteLine($"\nSubstance {line.Name}  {line.VialSize} was not found in inventory");
+                    continue;
                 }
+
+                sub.subtractStock(line.Stock);
             }
+        }
+
+        public void AddSubstance(Substance substance)
+        {
+            _substanceDict.Add(substance.Name + substance.VialSize, substance);
+        }
+
+        public void RemoveSubstance(Substance substance)
+        {
+            _substanceDict.Remove(substance.Name + substance.VialSize);
         }
 
         // To be implemented with GUI
@@ -77,63 +91,49 @@ namespace InventoryManagement
                 }
             }
 
-            string type = string.Empty;
-            while (true)
-            {
-                Console.WriteLine("Enter substance type:");
-                type = GetUserInput();
-                if (type.ToUpper() == "RS" || type.ToUpper() == "IS")
-                {
-                    break;
-                }
-            }
-
+            Console.WriteLine("Enter substance type:");
+            string type = GetUserInput();
             Substance substance;
             if (type == "RS")
             {
                 substance = new ReferenceSubstance(name, batch, size, stock, type);
             }
-            else
+            else if (type == "IS")
             {
                 substance = new InternalStandard(name, batch, size, stock, type);
+            }
+            else
+            {
+                substance = new Substance(name, batch, size, stock, type);
             }
 
             AddSubstance(substance);
 
+            // Nested method to get user input
             static string GetUserInput()
             {
                 // Continue polling for input until a string has been entered
                 string input = string.Empty;
                 while (string.IsNullOrEmpty(input))
                 {
-                    input = Console.ReadLine();
+                    input += Console.ReadLine();
                 }
 
                 return input;
             }
         }
 
-        public void AddSubstance(Substance substance)
-        {
-            _subDict.Add(substance.Name + substance.VialSize, substance);
-        }
-
-        public void RemoveSubstance(Substance substance)
-        {
-            _subDict.Remove(substance.Name + substance.VialSize);
-        }
-
         public Dictionary<string, Substance> GetInventoryList()
         {
-            return _subDict;
+            return _substanceDict;
         }
 
         public void PrintStock()
         {
             string output = string.Empty;
-            foreach(var key in _subDict)
+            foreach(var key in _substanceDict)
             {
-                output += $"{key.Value.Name} {key.Value.VialSize}, batch {key.Value.BatchNumber}: {key.Value.Stock} vials\n";
+                output += $"{key.Value.Type} {key.Value.Name} {key.Value.VialSize}, batch {key.Value.BatchNumber}: {key.Value.Stock} vials\n";
             }
 
             Console.WriteLine(output);
@@ -151,22 +151,24 @@ namespace InventoryManagement
 
                 while (csv.Read())
                 {
+                    Substance records;
                     if(csv.GetField("Type") == "RS")
                     {
-                        var records = csv.GetRecord<ReferenceSubstance>();
-                        if (records != null)
-                        {
-                            _instance.AddSubstance(records);
-                        }
+                        records = csv.GetRecord<ReferenceSubstance>();
+                    }
+                    else if(csv.GetField("Type") == "IS")
+                    {
+                        records = csv.GetRecord<InternalStandard>();
                     }
                     else
                     {
-                        var records = csv.GetRecord<InternalStandard>();
-                        if (records != null)
-                        {
-                            _instance.AddSubstance(records);
-                        }
-                    } 
+                        records = csv.GetRecord<Substance>();
+                    }
+
+                    if (records != null)
+                    {
+                        _instance.AddSubstance(records);
+                    }
                 }
             }
         }
@@ -179,7 +181,7 @@ namespace InventoryManagement
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 // Write the list of substances stored in inventory instance
-                csv.WriteRecords(_subDict);
+                csv.WriteRecords(_substanceDict);
             }
         }
     }

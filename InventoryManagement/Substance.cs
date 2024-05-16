@@ -14,6 +14,14 @@ namespace InventoryManagement
             this.Type = Type;
         }
 
+        // Constructor used for adding substances to order
+        public Substance(string Name, string VialSize, int Amount)
+        {
+            this.Name = Name;
+            this.VialSize = VialSize;
+            this.Stock = Amount;
+        }
+
         public string Name
         {
             get; private set;
@@ -22,7 +30,7 @@ namespace InventoryManagement
         public string BatchNumber
         {
             get; private set;
-        }
+        } = string.Empty;
 
         public string VialSize
         {
@@ -32,12 +40,12 @@ namespace InventoryManagement
         public int Stock
         {
             get; private set;
-        }
+        } = 0;
 
         public string Type
         {
             get; private set;
-        }
+        } = string.Empty;
 
         public void addStock(int amount)
         {

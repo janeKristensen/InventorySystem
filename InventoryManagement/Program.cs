@@ -16,7 +16,8 @@ namespace InventoryManagement
             // Inventory will subscribe to Ordermanagement to receive notifications on new orders
             orderManagement.Attach(inventory);
 
-            // Load inventory stock from csv file and print to terminal
+            // Load inventory stock and orders from csv file 
+            orderManagement.LoadOrders();
             inventory.LoadStock();
             Console.WriteLine("\nStock loaded in from file:\n");
             inventory.PrintStock();
@@ -29,12 +30,10 @@ namespace InventoryManagement
             Console.WriteLine("\nData from order:");
             order.PrintOrder();
             
-
             // Print stock to terminal and save to csv file
-            Console.WriteLine("Stock after order has been processed:\n");
+            Console.WriteLine("\nStock after order has been processed:\n");
             inventory.PrintStock();
             inventory.SaveStock();
-
             orderManagement.SaveOrders();
         }        
     }

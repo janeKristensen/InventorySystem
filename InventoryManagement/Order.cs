@@ -8,7 +8,7 @@ namespace InventoryManagement
 {
     public class Order
     {
-        public Order(string address, (string Name, string Size, int Amount)[] substances)
+        public Order(string address, Substance[] substances)
         {
             // Generating random unique id number 
             string hashString = Convert.ToString(DateTime.UtcNow);
@@ -24,20 +24,20 @@ namespace InventoryManagement
 
         public string Address
         {
-            get; set;
+            get; private set;
         }
 
-        public (string, string, int)[] SubstanceList
+        public Substance[] SubstanceList
         {
-            get; set;
+            get; private set;
         }
 
         public void PrintOrder()
         {
-            Console.WriteLine($"{Address}");
+            Console.WriteLine($"{Address}\n Substance order:");
             foreach (var substance in SubstanceList)
             {
-                Console.WriteLine(substance.ToString());
+                Console.WriteLine($"{substance.Name} {substance.VialSize}: {substance.Stock} pcs.");
             }
         }
     }
@@ -46,9 +46,9 @@ namespace InventoryManagement
     {
         public OrderMap()
         {
-            Map(m => m.Id).Index(1);
-            Map(m => m.Address).Index(2);
-            Map(m => m.SubstanceList).Index(3);
+            Map(m => m.Id);
+            Map(m => m.Address);
+            Map(m => m.SubstanceList);
         }
     }
 }

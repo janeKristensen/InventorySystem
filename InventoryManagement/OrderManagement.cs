@@ -17,8 +17,8 @@ namespace InventoryManagement
 
     public sealed class OrderManagement : IEventManager
     {
-        private Dictionary<int, Order> _orders = new Dictionary<int, Order>();
-        private List<IListener> _listeners = new List<IListener>();
+        private Dictionary<int, Order> _orders = new();
+        private List<IListener> _listeners = new();
 
         // Class is implemented as a singleton
         private static OrderManagement? _orderManager;
@@ -29,11 +29,6 @@ namespace InventoryManagement
                 _orderManager = new OrderManagement();
             }
             return _orderManager;
-        }
-
-        public void PrintOrders()
-        {
-            Console.WriteLine(_orders.ToString());
         }
 
         // Implementation of interface methods
@@ -55,15 +50,20 @@ namespace InventoryManagement
             }
         }
 
+        public void PrintOrders()
+        {
+            Console.WriteLine(_orders.ToString());
+        }
+
         // To be implemented with GUI
         // Create a new order and return
         public Order PressButtonToAddOrder()
         {
-            Order order = new Order(
+            Order order = new(
                "Industriparken 55, 2840 Ballerup",
-               new (string, string, int)[] {
-                    ("Methylparahydroxy", "100mg/vial", 10),
-                    ("Calcipotriol", "50mg/vial", 5),
+               new [] {
+                    new Substance("Methylparahydroxy", "100mg/vial", 10),
+                    new Substance("Calcipotriol", "50mg/vial", 5),
                });
 
             // Add the order object to dictionary with Id as key 
@@ -73,8 +73,6 @@ namespace InventoryManagement
             return order;
         }
 
-
-
         public void LoadOrders()
         {
             // Read from file path with CsvHelper library
@@ -83,23 +81,15 @@ namespace InventoryManagement
             using (var reader = new StreamReader("D:\\Visual Studio stuff\\Projekts\\InventoryManagement\\orders.csv")) 
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                csv.Context.RegisterClassMap<OrderMap>();
-
-                var records = new Dictionary<int, Order>();
-                
-               /* csv.Read();
-                csv.ReadHeader();
                 while (csv.Read())
                 {
-                    (string, string, int)[] orderList = csv.GetField<(string, string, int)[]>(3);
-                    var order = new Order
-                    (
-                        csv.GetField<string>("Address"),
-                        orderList
-                    ) ;
-                    records.Add(csv.GetField<int>("Key"), order);
+                    var records = csv.GetRecord<Order>();
                     
-                }*/
+                    if (records != null)
+                    {
+                        _orders.Add(records.Id, records);
+                    }
+                }
             }
         }
 
