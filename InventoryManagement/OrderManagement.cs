@@ -62,48 +62,15 @@ namespace InventoryManagement
             Order order = new(
                "Industriparken 55, 2840 Ballerup",
                new [] {
-                    new Substance("Methylparahydroxy", "100mg/vial", 10),
-                    new Substance("Calcipotriol", "50mg/vial", 5),
+                    new Substance("Delgocitinib", "A01", "100mg/vial", 10),
                });
 
             // Add the order object to dictionary with Id as key 
-            _orders.Add(order.Id, order);
-            Notify(order);
+            this._orders.Add(order.Id, order);
+            this.Notify(order);
 
             return order;
         }
 
-        public void LoadOrders()
-        {
-            // Read from file path with CsvHelper library
-            // 'using' keyword - to dispose of IDisposable objects when out of scope
-
-            using (var reader = new StreamReader("D:\\Visual Studio stuff\\Projekts\\InventoryManagement\\orders.csv")) 
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                while (csv.Read())
-                {
-                    var records = csv.GetRecord<Order>();
-                    
-                    if (records != null)
-                    {
-                        _orders.Add(records.Id, records);
-                    }
-                }
-            }
-        }
-
-        public void SaveOrders()
-        {
-            // Write to file path with CsvHelper library
-            // 'using' keyword - to dispose of IDisposable objects when out of scope
-            using (var writer = new StreamWriter("D:\\Visual Studio stuff\\Projekts\\InventoryManagement\\orders.csv"))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                csv.Context.RegisterClassMap<OrderMap>();
-                // Write the list of substances stored in inventory instance
-                csv.WriteRecords(_orders);
-            }
-        }
     }
 }

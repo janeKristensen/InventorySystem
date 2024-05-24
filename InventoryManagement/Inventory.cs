@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using System.Drawing;
 using System.Globalization;
+using System.Security.Policy;
 using System.Xml.Linq;
 
 namespace InventoryManagement
@@ -13,11 +14,10 @@ namespace InventoryManagement
 
     public sealed class Inventory : IListener
     {
-        // All substances that have been added to inventory
-        private Dictionary<string, Substance> _substanceDict = new();
 
         // Class is implemented as a singleton
         private static Inventory? _instance;
+        SubstanceContext db = new SubstanceContext();
 
         public static Inventory GetInstance()
         {
@@ -35,33 +35,22 @@ namespace InventoryManagement
             Console.WriteLine("\nOrder received in inventory!\n");
 
             // Locate substance in dictionary using key and subtract amount from stock
-            foreach (var line in order.SubstanceList)
+            foreach(var line in order.SubstanceList)
             {
-                string key = (line.Name + line.VialSize);
-                Substance sub;
-                try
-                {
-                    sub = _substanceDict[key];
-                }
-                catch (KeyNotFoundException)
-                {
-                    Console.WriteLine($"\nSubstance {line.Name}  {line.VialSize} was not found in inventory");
-                    continue;
-                }
-
-                sub.subtractStock(line.Stock);
+                var sub = db.ReferenceSubstances.Find(line.BatchNumber);
+                sub.Stock -= line.Stock;
+                db.SaveChanges();
             }
         }
 
-        public void AddSubstance(Substance substance)
-        {
-            _substanceDict.Add(substance.Name + substance.VialSize, substance);
-        }
 
         public void RemoveSubstance(Substance substance)
         {
-            _substanceDict.Remove(substance.Name + substance.VialSize);
+                db.ReferenceSubstances.Attach(substance);
+                db.ReferenceSubstances.Remove(substance);
+                db.SaveChanges();
         }
+
 
         // To be implemented with GUI
         // Take input from user and return new substance
@@ -79,9 +68,9 @@ namespace InventoryManagement
             int stock = 0;
             while (stock <= 0)
             {
+                Console.WriteLine("Enter amount in stock:");
                 try
                 {
-                    Console.WriteLine("Enter amount in stock:");
                     stock = Convert.ToInt32(GetUserInput());
                 }
                 // Catch exception and continue to take input if input cannot be converted to int
@@ -93,24 +82,15 @@ namespace InventoryManagement
 
             Console.WriteLine("Enter substance type:");
             string type = GetUserInput();
-            Substance substance;
-            if (type == "RS")
-            {
-                substance = new ReferenceSubstance(name, batch, size, stock, type);
-            }
-            else if (type == "IS")
-            {
-                substance = new InternalStandard(name, batch, size, stock, type);
-            }
-            else
-            {
-                substance = new Substance(name, batch, size, stock, type);
-            }
 
-            AddSubstance(substance);
+            // Add to database and save
+
+            db.Add(new Substance(name, batch, size, stock, type));
+            db.SaveChanges();
+
 
             // Nested method to get user input
-            static string GetUserInput()
+            string GetUserInput()
             {
                 // Continue polling for input until a string has been entered
                 string input = string.Empty;
@@ -123,66 +103,11 @@ namespace InventoryManagement
             }
         }
 
-        public Dictionary<string, Substance> GetInventoryList()
-        {
-            return _substanceDict;
-        }
 
         public void PrintStock()
         {
-            string output = string.Empty;
-            foreach(var key in _substanceDict)
-            {
-                output += $"{key.Value.Type} {key.Value.Name} {key.Value.VialSize}, batch {key.Value.BatchNumber}: {key.Value.Stock} vials\n";
-            }
-
-            Console.WriteLine(output);
+            Console.WriteLine("");
         }
 
-        public void LoadStock()
-        {
-            // Read from file path with CsvHelper library
-            // 'using' keyword - to dispose of IDisposable objects when out of scope
-            using (var reader = new StreamReader("D:\\Visual Studio stuff\\Projekts\\InventoryManagement\\stock.csv"))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                csv.Read();
-                csv.ReadHeader();
-
-                while (csv.Read())
-                {
-                    Substance records;
-                    if(csv.GetField("Type") == "RS")
-                    {
-                        records = csv.GetRecord<ReferenceSubstance>();
-                    }
-                    else if(csv.GetField("Type") == "IS")
-                    {
-                        records = csv.GetRecord<InternalStandard>();
-                    }
-                    else
-                    {
-                        records = csv.GetRecord<Substance>();
-                    }
-
-                    if (records != null)
-                    {
-                        _instance.AddSubstance(records);
-                    }
-                }
-            }
-        }
-
-        public void SaveStock()
-        {
-            // Write to file path with CsvHelper library
-            // 'using' keyword - to dispose of IDisposable objects when out of scope
-            using (var writer = new StreamWriter("D:\\Visual Studio stuff\\Projekts\\InventoryManagement\\stock.csv"))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                // Write the list of substances stored in inventory instance
-                csv.WriteRecords(_substanceDict);
-            }
-        }
     }
 }

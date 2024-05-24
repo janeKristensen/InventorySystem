@@ -8,13 +8,13 @@ namespace InventoryManagement
 {
     public class Order
     {
-        public Order(string address, Substance[] substances)
+        public Order(string Address, Substance[] SubstanceList)
         {
             // Generating random unique id number 
             string hashString = Convert.ToString(DateTime.UtcNow);
-            Id = hashString.GetHashCode();
-            Address = address;
-            SubstanceList = substances;  
+            this.Id = hashString.GetHashCode();
+            this.Address = Address;
+            this.SubstanceList = SubstanceList;  
         }
 
         public int Id
@@ -34,21 +34,11 @@ namespace InventoryManagement
 
         public void PrintOrder()
         {
-            Console.WriteLine($"{Address}\n Substance order:");
-            foreach (var substance in SubstanceList)
+            Console.WriteLine($"{this.Address}\nSubstance order:");
+            foreach (var substance in this.SubstanceList)
             {
-                Console.WriteLine($"{substance.Name} {substance.VialSize}: {substance.Stock} pcs.");
+                Console.WriteLine($"{substance.Name} {substance.Unit}: {substance.Stock} pcs.");
             }
-        }
-    }
-
-    public sealed class OrderMap : ClassMap<Order>
-    {
-        public OrderMap()
-        {
-            Map(m => m.Id);
-            Map(m => m.Address);
-            Map(m => m.SubstanceList);
         }
     }
 }

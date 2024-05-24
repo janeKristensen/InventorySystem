@@ -1,4 +1,5 @@
 Key,Name,BatchNumber,VialSize,Stock,Type
-Methylparahydroxy100mg/vial,Methylparahydroxy,Z40,100mg/vial,140,IS
+Methylparahydroxy100mg/vial,Methylparahydroxy,Z40,100mg/vial,110,IS
 Betamethasone dipropionate250mg/vial,Betamethasone dipropionate,X09,250mg/vial,100,RS
-
+Delgocitinib10mg/vial,Delgocitinib,A01,10mg/vial,500,RS
+test10,test,a,10,100,RS
