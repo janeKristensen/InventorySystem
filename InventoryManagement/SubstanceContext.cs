@@ -16,5 +16,3 @@ namespace InventoryManagement
            => options.UseSqlServer($"Data Source ={ConfigurationManager.AppSettings["server"]}; Integrated Security = SSPI; User Instance = false; Database = Substances;");
     }
 }
-//C:\\Program Files\\Microsoft SQL Server\\MSSQL16.SQLEXPRESS\\MSSQL\\DATA\\Substances.mdf
-//$"Data Source ={ConfigurationManager.AppSettings["server"]}; TrustServerCertificate=True; Integrated Security = true; AttachDbFilename = {ConfigurationManager.AppSettings["database"]};"
