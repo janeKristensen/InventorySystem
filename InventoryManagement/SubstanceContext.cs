@@ -13,7 +13,6 @@ namespace InventoryManagement
         public SubstanceContext() { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-
             => options.UseSqlServer($"Data Source ={ConfigurationManager.AppSettings["server"]}; Integrated Security = SSPI; User Instance = false; Database = Substances;");
     }
 }

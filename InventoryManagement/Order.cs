@@ -2,32 +2,27 @@
 using CsvHelper.TypeConversion;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace InventoryManagement
 {
     public class Order
     {
-        public Order(string Address, Substance[] SubstanceList)
+        Substance[] SubstanceList;
+
+        public Order(string Address )
         {
-            // Generating random unique id number 
-            string hashString = Convert.ToString(DateTime.UtcNow);
-            this.Id = hashString.GetHashCode();
             this.Address = Address;
-            this.SubstanceList = SubstanceList;  
         }
 
+        [Key]
         public int Id
         {
             get;
         }
 
         public string Address
-        {
-            get; private set;
-        }
-
-        public Substance[] SubstanceList
         {
             get; private set;
         }

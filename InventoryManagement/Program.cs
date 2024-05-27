@@ -21,7 +21,9 @@ namespace InventoryManagement
             //inventory.PressButtonForNewSubstance();
 
             // Add a new order - GUI implementation to be made
-            var order = orderManagement.PressButtonToAddOrder();
+            orderManagement.PressButtonToAddOrder();
+            inventory.PrintStock();
+            orderManagement.PrintOrders();  
         }        
     }
 }

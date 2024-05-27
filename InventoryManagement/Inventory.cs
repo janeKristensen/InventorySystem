@@ -32,7 +32,7 @@ namespace InventoryManagement
         public void Update(Order order)
         {
             Console.WriteLine("\nOrder received in inventory!\n");
-
+            /*
             using (var db = new SubstanceContext())
             {
                 // Locate substance in dictionary using key and subtract amount from stock
@@ -43,6 +43,7 @@ namespace InventoryManagement
                     db.SaveChanges();
                 }
             };
+            */
                
         }
 
@@ -114,7 +115,15 @@ namespace InventoryManagement
 
         public void PrintStock()
         {
-            Console.WriteLine("");
+            using (var db = new SubstanceContext())
+            {
+                var items = db.ReferenceSubstances.ToList();
+                foreach (var item in items)
+                {
+                    Console.WriteLine($"{item.Name}, {item.BatchNumber}, {item.Unit}: {item.Stock}");
+                }
+            }
+                
         }
 
     }

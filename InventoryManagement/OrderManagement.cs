@@ -2,8 +2,10 @@
 
 using CsvHelper;
 using CsvHelper.Configuration;
+using System.Drawing;
 using System.Globalization;
 using System.Reflection;
+using System.Xml.Linq;
 
 namespace InventoryManagement
 {
@@ -52,25 +54,30 @@ namespace InventoryManagement
 
         public void PrintOrders()
         {
-            Console.WriteLine(_orders.ToString());
+            using (var db = new OrderContext())
+            {
+                var items = db.Orders.ToList();
+                foreach (var item in items)
+                {
+                    Console.WriteLine($"{item.Address}");
+                }
+            }
         }
 
         // To be implemented with GUI
         // Create a new order and return
-        public Order PressButtonToAddOrder()
+        public void PressButtonToAddOrder()
         {
-            Order order = new(
-               "Industriparken 55, 2840 Ballerup",
-               new [] {
-                    new Substance("Delgocitinib", "A01", "100mg/vial", 10),
-               });
+            using (var db = new OrderContext())
+            {
+                var order = new Order("Industriparken 55, 2840 Ballerup");
+                // Add to database and save
+                db.Add(order);
+                db.SaveChanges();
 
-            // Add the order object to dictionary with Id as key 
-            this._orders.Add(order.Id, order);
-            this.Notify(order);
-
-            return order;
+                // Add the order object to dictionary with Id as key 
+                this.Notify(order);
+            }; 
         }
-
     }
 }
