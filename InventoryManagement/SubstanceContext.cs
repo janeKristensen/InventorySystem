@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 using InventoryManagement;
 using Microsoft.EntityFrameworkCore;
-using static System.Net.Mime.MediaTypeNames;
+
 
 namespace InventoryManagement
 {
@@ -14,25 +10,11 @@ namespace InventoryManagement
     {
         public DbSet<Substance> ReferenceSubstances { get; set; }
 
-
-        // Class is implemented as a singleton
-        private static SubstanceContext? _instance;
-
-        public static SubstanceContext GetInstance()
-        {
-            if (_instance == null)
-            {
-                _instance = new SubstanceContext();
-            }
-            return _instance;
-        }
-
+        public SubstanceContext() { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlServer($"Data Source =DESKTOP-OMN8M0M\\SQLEXPRESS; Integrated Security = true; AttachDbFilename = C:\\Program Files\\Microsoft SQL Server\\MSSQL16.SQLEXPRESS\\MSSQL\\DATA\\Substances.mdf; User Instance = true;Database = Substances.ReferenceSubstances;");
+            => options.UseSqlServer($"Data Source ={ConfigurationManager.AppSettings["server"]}; Integrated Security = SSPI; User Instance = false; Database = Substances;");
     }
 }
-
-
-//Server = DESKTOP - OMN8M0M\\SQLEXPRESS; Database = Substances.ReferenceSubstances; user id = InventoryApp; Password = test; Integrated Security = False; MultipleActiveResultSets = true; TrustServerCertificate = True; Encrypt = False");
-    
+//C:\\Program Files\\Microsoft SQL Server\\MSSQL16.SQLEXPRESS\\MSSQL\\DATA\\Substances.mdf
+//$"Data Source ={ConfigurationManager.AppSettings["server"]}; TrustServerCertificate=True; Integrated Security = true; AttachDbFilename = {ConfigurationManager.AppSettings["database"]};"

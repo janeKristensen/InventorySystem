@@ -17,7 +17,6 @@ namespace InventoryManagement
 
         // Class is implemented as a singleton
         private static Inventory? _instance;
-        SubstanceContext db = new SubstanceContext();
 
         public static Inventory GetInstance()
         {
@@ -34,26 +33,33 @@ namespace InventoryManagement
         {
             Console.WriteLine("\nOrder received in inventory!\n");
 
-            // Locate substance in dictionary using key and subtract amount from stock
-            foreach(var line in order.SubstanceList)
+            using (var db = new SubstanceContext())
             {
-                var sub = db.ReferenceSubstances.Find(line.BatchNumber);
-                sub.Stock -= line.Stock;
-                db.SaveChanges();
-            }
+                // Locate substance in dictionary using key and subtract amount from stock
+                foreach (var line in order.SubstanceList)
+                {
+                    var sub = db.ReferenceSubstances.Find(line.BatchNumber);
+                    sub.Stock -= line.Stock;
+                    db.SaveChanges();
+                }
+            };
+               
         }
 
 
         public void RemoveSubstance(Substance substance)
         {
+            using (var db = new SubstanceContext())
+            {
                 db.ReferenceSubstances.Attach(substance);
                 db.ReferenceSubstances.Remove(substance);
                 db.SaveChanges();
+            };
         }
 
 
         // To be implemented with GUI
-        // Take input from user and return new substance
+        // Take input from user and add to database
         public void PressButtonForNewSubstance()
         {
             Console.WriteLine("Enter substance name:");
@@ -83,10 +89,12 @@ namespace InventoryManagement
             Console.WriteLine("Enter substance type:");
             string type = GetUserInput();
 
-            // Add to database and save
-
-            db.Add(new Substance(name, batch, size, stock, type));
-            db.SaveChanges();
+            using (var db = new SubstanceContext())
+            {
+                // Add to database and save
+                db.Add(new Substance(name, batch, size, stock, type));
+                db.SaveChanges();
+            };
 
 
             // Nested method to get user input
