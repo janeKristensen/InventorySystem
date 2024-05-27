@@ -17,5 +17,8 @@ namespace InventoryManagement
             => options.UseSqlServer($"Data Source ={ConfigurationManager.AppSettings["server"]}; Integrated Security = SSPI; User Instance = false; Database = Substances;");
     }
 }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> ee02f33b106b548d2b04bd8a7bb582168dac151e
