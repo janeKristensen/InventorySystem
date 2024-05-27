@@ -34,5 +34,5 @@ namespace InventoryManagement
 }
 
 
-//Server = DESKTOP - OMN8M0M\\SQLEXPRESS; Database = Substances.ReferenceSubstances; user id = InventoryApp; Password = test; Integrated Security = False; MultipleActiveResultSets = true; TrustServerCertificate = True; Encrypt = False");
+
     
