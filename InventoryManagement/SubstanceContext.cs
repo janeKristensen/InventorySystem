@@ -29,7 +29,7 @@ namespace InventoryManagement
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlServer($"Data Source =DESKTOP-OMN8M0M\\SQLEXPRESS; Integrated Security = true; AttachDbFilename = C:\\Program Files\\Microsoft SQL Server\\MSSQL16.SQLEXPRESS\\MSSQL\\DATA\\Substances.mdf; User Instance = true;Database = Substances.ReferenceSubstances;");
+            => options.UseSqlServer($"Data Source =.\\SQLEXPRESS; Integrated Security = true; AttachDbFilename = .\\Substances.mdf; User Instance = true;Database = Substances.ReferenceSubstances;");
     }
 }
 
