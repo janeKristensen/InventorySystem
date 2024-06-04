@@ -1,26 +1,29 @@
-﻿using System;
+﻿using CsvHelper.Configuration;
+using System;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InventoryManagement
 {
-
     public class Substance
     {
-        public Substance(string Name, string BatchNumber, string VialSize, int Stock)
+        public Substance(string Name, string BatchNumber, string Unit, int Stock, string RefType)
         {
             this.Name = Name;
             this.BatchNumber = BatchNumber;
-            this.VialSize = VialSize;
+            this.Unit = Unit;
             this.Stock = Stock;
+            this.RefType = RefType;
         }
 
-        public void addStock(int amount)
+        // Constructor used for adding substances to order
+        public Substance(string Name, string BatchNumber, string Unit,int Amount)
         {
-            Stock += amount;
-        }
-
-        public void subtractStock(int amount)
-        {
-            Stock -= amount;
+            this.Name = Name;
+            this.BatchNumber = BatchNumber;
+            this.Unit = Unit;
+            this.Stock = Amount;
         }
 
         public string Name
@@ -28,19 +31,69 @@ namespace InventoryManagement
             get; private set;
         }
 
+        [Key]
         public string BatchNumber
         {
-            get; private set;
+            get; set;
         }
 
-        public string VialSize
+        public ICollection<OrderDetail> OrderDetails { get; set; }
+
+        public string Unit
         {
             get; private set;
         }
 
         public int Stock
         {
+            get; set;
+        } = 0;
+
+        public string RefType
+        {
             get; private set;
+        } = string.Empty;
+
+        public void addStock(int amount)
+        {
+            this.Stock += amount;
+        }
+
+        public void subtractStock(int amount)
+        {
+            this.Stock -= amount;
+        }
+
+        public virtual void DoTypeStuff()
+        {
+            Console.WriteLine("Doing substance stuff");
+        }
+        
+    }
+
+
+
+    public class ReferenceSubstance : Substance
+    {
+        public ReferenceSubstance(string Name, string BatchNumber, string VialSize, int Stock, string Type) : base(Name, BatchNumber, VialSize, Stock, Type) { }
+
+        public override void DoTypeStuff()
+        {
+            Console.WriteLine("Doing Reference Substance stuff");
+        }
+    }
+
+
+
+    public class InternalStandard : Substance
+    {
+        public InternalStandard(string Name, string BatchNumber, string VialSize, int Stock, string Type) : base(Name, BatchNumber, VialSize, Stock, Type) { }
+
+        public override void DoTypeStuff()
+        {
+            Console.WriteLine("Doing Internal Standard stuff");
         }
     }
 }
+
+
