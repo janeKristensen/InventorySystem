@@ -32,23 +32,23 @@ namespace InventoryManagement
         public void Update(Order order)
         {
             Console.WriteLine("\nOrder received in inventory!\n");
-            /*
+            
             using (var db = new SubstanceContext())
             {
-                // Locate substance in dictionary using key and subtract amount from stock
-                foreach (var line in order.SubstanceList)
+                foreach (var line in order.OrderDetails)
                 {
-                    var sub = db.ReferenceSubstances.Find(line.BatchNumber);
-                    sub.Stock -= line.Stock;
-                    db.SaveChanges();
+                    var sub = db.ReferenceSubstances.Find(line.Substance.BatchNumber);
+                    if (sub != null)
+                    {
+                        sub.Stock -= line.Amount;
+                        db.SaveChanges();
+                    }
                 }
-            };
-            */
-               
+            };  
         }
 
 
-        public void RemoveSubstance(Substance substance)
+        public static void RemoveSubstance(Substance substance)
         {
             using (var db = new SubstanceContext())
             {
@@ -61,7 +61,7 @@ namespace InventoryManagement
 
         // To be implemented with GUI
         // Take input from user and add to database
-        public void PressButtonForNewSubstance()
+        public static void PressButtonForNewSubstance()
         {
             Console.WriteLine("Enter substance name:");
             string name = GetUserInput();
@@ -99,7 +99,7 @@ namespace InventoryManagement
 
 
             // Nested method to get user input
-            string GetUserInput()
+            static string GetUserInput()
             {
                 // Continue polling for input until a string has been entered
                 string input = string.Empty;

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InventoryManagement
 {
@@ -33,8 +34,10 @@ namespace InventoryManagement
         [Key]
         public string BatchNumber
         {
-            get; private set;
-        } = string.Empty;
+            get; set;
+        }
+
+        public ICollection<OrderDetail> OrderDetails { get; set; }
 
         public string Unit
         {

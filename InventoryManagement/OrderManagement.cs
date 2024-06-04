@@ -19,7 +19,6 @@ namespace InventoryManagement
 
     public sealed class OrderManagement : IEventManager
     {
-        private Dictionary<int, Order> _orders = new();
         private List<IListener> _listeners = new();
 
         // Class is implemented as a singleton
@@ -54,7 +53,7 @@ namespace InventoryManagement
 
         public void PrintOrders()
         {
-            using (var db = new OrderContext())
+            using (var db = new SubstanceContext())
             {
                 var items = db.Orders.ToList();
                 foreach (var item in items)
@@ -68,14 +67,24 @@ namespace InventoryManagement
         // Create a new order and return
         public void PressButtonToAddOrder()
         {
-            using (var db = new OrderContext())
+            using (var db = new SubstanceContext())
             {
-                var order = new Order("Industriparken 55, 2840 Ballerup");
-                // Add to database and save
+                var order = new Order("Test address");
                 db.Add(order);
                 db.SaveChanges();
 
-                // Add the order object to dictionary with Id as key 
+                var substance = db.ReferenceSubstances.Where(e => e.Name == "Delgocitinib").First();
+                var detail = new OrderDetail(order.Id, substance.BatchNumber, 50);
+                db.Add(detail);
+                db.SaveChanges();
+
+                order.OrderDetails.Add(detail);
+
+                // Add to database and save
+                
+                db.SaveChanges();
+
+                
                 this.Notify(order);
             }; 
         }

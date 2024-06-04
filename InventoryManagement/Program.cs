@@ -22,7 +22,9 @@ namespace InventoryManagement
 
             // Add a new order - GUI implementation to be made
             orderManagement.PressButtonToAddOrder();
+            Console.WriteLine("This is stock from database");
             inventory.PrintStock();
+            Console.WriteLine("This is all orders:");
             orderManagement.PrintOrders();  
         }        
     }
